@@ -1,4 +1,4 @@
-package eng.ser.com;
+package ser;
 
 public class Constants {
 
