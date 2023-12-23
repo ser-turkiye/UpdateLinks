@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package eng.ser.com;
+package ser;
 
 import com.ser.blueline.*;
 import com.ser.blueline.metaDataComponents.*;
@@ -43,7 +43,7 @@ public class UpdateLinks extends UnifiedAgent {
 
             IDocument ldoc = this.getEventDocument();
             try {
-                setParent(ldoc);
+                this.setParent(ldoc);
                 this.log.info("Finished");
                 return this.resultSuccess("Ended successfully");
             } catch (Exception var15) {
@@ -57,15 +57,21 @@ public class UpdateLinks extends UnifiedAgent {
         String chkKeyPrnt = engDocument.getDescriptorValue("ccmPrjDocParentDoc");
         String chkKeyCrrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
         String chkKeyCrrsOut = engDocument.getDescriptorValue("ccmPrjDocTransOutCode");
+        List<String> linkList = new ArrayList<>();
+        ILink[] links = srv.getReferencedRelationships(ses, engDocument, true, false);
+        for(ILink link : links){
+            linkList.add(link.getTargetDocumentId());
+        }
         this.log.info("Start Link for Parent Number:" + chkKeyPrnt + " child number:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
         if (prjCode != null){
             if(chkKeyPrnt != null){
                 IDocument prntDocument = getEngDocumentByNumber(ses, prjCode, chkKeyPrnt);
                 this.log.info("Parent Doc ? " + prntDocument);
                 if (prntDocument != null && !prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID())) {
+                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(prntDocument.getID())) {
                         ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                         lnk2.commit();
+                        engDocument.commit();
                         this.log.info("Created Link...");
                     }
                 }
@@ -74,9 +80,10 @@ public class UpdateLinks extends UnifiedAgent {
                 IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsInc);
                 this.log.info("Parent (CRRS) Doc ? " + prntDocument);
                 if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID())) {
+                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(prntDocument.getID())) {
                         ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                         lnk2.commit();
+                        engDocument.commit();
                         this.log.info("Created Link...");
                     }
                 }
@@ -85,9 +92,10 @@ public class UpdateLinks extends UnifiedAgent {
                 IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsOut);
                 this.log.info("Parent (CRRS) Doc ? " + prntDocument);
                 if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID())) {
+                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(prntDocument.getID())) {
                         ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                         lnk2.commit();
+                        engDocument.commit();
                         this.log.info("Created Link...");
                     }
                 }

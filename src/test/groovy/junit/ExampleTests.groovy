@@ -1,7 +1,7 @@
 package junit
 
 import de.ser.doxis4.agentserver.AgentExecutionResult
-import eng.ser.com.UpdateLinks
+import ser.UpdateLinks
 import org.junit.*
 
 class ExampleTests {
@@ -22,8 +22,7 @@ class ExampleTests {
     void testForAgentResult() {
         def agent = new UpdateLinks();
 
-        //String ids ="SD06D_QCON24859b3414-ee73-4151-9b0d-0e5b93edf494182023-10-13T14:28:26.483Z011"
-        String ids ="SD06D_QCON2487db58c0-389c-468a-9de9-635cda71054c182023-12-21T10:07:33.909Z011"
+        String ids ="SD07PRJ_DOC247741a9a0-d127-42ca-86de-87c5fd22a6ca182023-12-21T11:07:58.402Z011"
 
 
 
