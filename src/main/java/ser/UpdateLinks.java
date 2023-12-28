@@ -43,7 +43,7 @@ public class UpdateLinks extends UnifiedAgent {
             IDocument ldoc = this.getEventDocument();
             prjCode = ldoc.getDescriptorValue("ccmPRJCard_code");
             try {
-                //this.setParent(ldoc);
+                this.setParent(ldoc);
                 this.updateTransmittals(ldoc);
                 this.log.info("UpdateLinks Finished");
                 return this.resultSuccess("Ended successfully");
@@ -58,7 +58,7 @@ public class UpdateLinks extends UnifiedAgent {
             String trasnmittals = engDocument.getDescriptorValue("ccmPrjDocTransmittals");
             String crrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
             String crrsOut = engDocument.getDescriptorValue("ccmPrjDocTransOutCode");
-            List<String> allTransmittals = getStrings(trasnmittals, crrsInc, crrsOut);
+            List<String> allTransmittals = getAllTransmittals(trasnmittals, crrsInc, crrsOut);
 
             engDocument.setDescriptorValue("ccmPrjDocTransmittals",String.join("\n",allTransmittals));
             engDocument.commit();
@@ -67,7 +67,7 @@ public class UpdateLinks extends UnifiedAgent {
         }
     }
 
-    private static List<String> getStrings(String trasnmittals, String crrsInc, String crrsOut) {
+    private static List<String> getAllTransmittals(String trasnmittals, String crrsInc, String crrsOut) {
         List<String> currentTransmittals = new ArrayList<>();
 
         if(trasnmittals != null){
