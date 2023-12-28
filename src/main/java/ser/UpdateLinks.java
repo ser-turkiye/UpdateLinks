@@ -43,78 +43,114 @@ public class UpdateLinks extends UnifiedAgent {
             IDocument ldoc = this.getEventDocument();
             prjCode = ldoc.getDescriptorValue("ccmPRJCard_code");
             try {
-                this.setParent(ldoc);
-                this.log.info("Finished");
+                //this.setParent(ldoc);
+                this.updateTransmittals(ldoc);
+                this.log.info("UpdateLinks Finished");
                 return this.resultSuccess("Ended successfully");
             } catch (Exception var15) {
                 throw new RuntimeException(var15);
             }
         }
     }
+    public void updateTransmittals(IDocument engDocument) throws Exception {
+        this.log.info("Start update transmittals.....");
+        try {
+            String trasnmittals = engDocument.getDescriptorValue("ccmPrjDocTransmittals");
+            String crrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
+            String crrsOut = engDocument.getDescriptorValue("ccmPrjDocTransOutCode");
+            List<String> allTransmittals = getStrings(trasnmittals, crrsInc, crrsOut);
 
-    public void setParent(IDocument engDocument){
+            engDocument.setDescriptorValue("ccmPrjDocTransmittals",String.join("\n",allTransmittals));
+            engDocument.commit();
+        }catch (Exception e){
+            throw new Exception("Exeption Caught..updateTransmittals: " + e);
+        }
+    }
+
+    private static List<String> getStrings(String trasnmittals, String crrsInc, String crrsOut) {
+        List<String> currentTransmittals = new ArrayList<>();
+
+        if(trasnmittals != null){
+            currentTransmittals = new ArrayList<>(Arrays.asList(trasnmittals.split("\n")));
+        }
+        List<String> allTransmittals = new ArrayList<>(currentTransmittals);
+
+        if(crrsInc != null && !allTransmittals.contains(crrsInc)){
+            allTransmittals.add(crrsInc);
+        }
+        if(crrsOut != null && !allTransmittals.contains(crrsOut)){
+            allTransmittals.add(crrsOut);
+        }
+        return allTransmittals;
+    }
+
+    public void setParent(IDocument engDocument) throws Exception {
         this.log.info("Start Link.....");
-        String chkKeyPrnt = engDocument.getDescriptorValue("ccmPrjDocParentDoc");
-        String chkKeyCrrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
-        String chkKeyCrrsOut = engDocument.getDescriptorValue("ccmPrjDocTransOutCode");
-        List<String> linkList = new ArrayList<>();
+        try {
+            String chkKeyPrnt = engDocument.getDescriptorValue("ccmPrjDocParentDoc");
+            String chkKeyCrrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
+            String chkKeyCrrsOut = engDocument.getDescriptorValue("ccmPrjDocTransOutCode");
+            List<String> linkList = new ArrayList<>();
 
-        this.log.info("Start Link for Parent Number:" + chkKeyPrnt + " child number:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
-        if (prjCode != null){
-            if(chkKeyPrnt != null){
-                IDocument prntDocument = getEngDocumentByNumber(ses, prjCode, chkKeyPrnt);
-                this.log.info("Parent Doc ? " + prntDocument);
-                if(prntDocument != null){
-                    ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
-                    for(ILink link : links){
-                        linkList.add(link.getTargetDocumentId());
+            this.log.info("Start Link for Parent Number:" + chkKeyPrnt + " child number:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
+            if (prjCode != null){
+                if(chkKeyPrnt != null){
+                    IDocument prntDocument = getEngDocumentByNumber(ses, prjCode, chkKeyPrnt);
+                    this.log.info("Parent Doc ? " + prntDocument);
+                    if(prntDocument != null){
+                        ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
+                        for(ILink link : links){
+                            linkList.add(link.getTargetDocumentId());
+                        }
+                    }
+                    if (prntDocument != null && !prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                        if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
+                            ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
+                            lnk2.commit();
+                            engDocument.commit();
+                            this.log.info("Created Link...");
+                        }
                     }
                 }
-                if (prntDocument != null && !prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
-                        ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
-                        lnk2.commit();
-                        engDocument.commit();
-                        this.log.info("Created Link...");
+                if(chkKeyCrrsInc != null){
+                    IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsInc);
+                    this.log.info("Parent (CRRS) Doc ? " + prntDocument);
+                    if(prntDocument != null){
+                        ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
+                        for(ILink link : links){
+                            linkList.add(link.getTargetDocumentId());
+                        }
+                    }
+                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                        if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
+                            ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
+                            lnk2.commit();
+                            engDocument.commit();
+                            this.log.info("Created Link...");
+                        }
+                    }
+                }
+                if(chkKeyCrrsOut != null){
+                    IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsOut);
+                    this.log.info("Parent (CRRS) Doc ? " + prntDocument);
+                    if(prntDocument != null){
+                        ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
+                        for(ILink link : links){
+                            linkList.add(link.getTargetDocumentId());
+                        }
+                    }
+                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                        if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
+                            ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
+                            lnk2.commit();
+                            engDocument.commit();
+                            this.log.info("Created Link...");
+                        }
                     }
                 }
             }
-            if(chkKeyCrrsInc != null){
-                IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsInc);
-                this.log.info("Parent (CRRS) Doc ? " + prntDocument);
-                if(prntDocument != null){
-                    ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
-                    for(ILink link : links){
-                        linkList.add(link.getTargetDocumentId());
-                    }
-                }
-                if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
-                        ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
-                        lnk2.commit();
-                        engDocument.commit();
-                        this.log.info("Created Link...");
-                    }
-                }
-            }
-            if(chkKeyCrrsOut != null){
-                IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsOut);
-                this.log.info("Parent (CRRS) Doc ? " + prntDocument);
-                if(prntDocument != null){
-                    ILink[] links = srv.getReferencedRelationships(ses, prntDocument, true, false);
-                    for(ILink link : links){
-                        linkList.add(link.getTargetDocumentId());
-                    }
-                }
-                if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
-                    if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
-                        ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
-                        lnk2.commit();
-                        engDocument.commit();
-                        this.log.info("Created Link...");
-                    }
-                }
-            }
+        }catch (Exception e){
+            throw new Exception("Exeption Caught..setParent: " + e);
         }
     }
 
