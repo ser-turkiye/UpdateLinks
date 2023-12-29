@@ -34,7 +34,7 @@ public class UpdateLinks extends UnifiedAgent {
     }
 
     protected Object execute() {
-        this.log.info("Initiate the agent");
+        this.log.info("Initiate the UpdateLinks agent");
         if (this.getEventDocument() == null) {
             return this.resultError("Null Document object.");
         } else {
@@ -47,13 +47,14 @@ public class UpdateLinks extends UnifiedAgent {
                 this.updateTransmittals(ldoc);
                 this.log.info("UpdateLinks Finished");
                 return this.resultSuccess("Ended successfully");
-            } catch (Exception var15) {
-                throw new RuntimeException(var15);
+            } catch (Exception e) {
+                //return resultRestart("Restarting Agent for copyLayerToOtherSubDocuments");
+                return resultError(e.getMessage());
             }
         }
     }
     public void updateTransmittals(IDocument engDocument) throws Exception {
-        this.log.info("Start update transmittals.....");
+        this.log.info("Start update transmittals.....:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
         try {
             String trasnmittals = engDocument.getDescriptorValue("ccmPrjDocTransmittals");
             String crrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
@@ -85,7 +86,7 @@ public class UpdateLinks extends UnifiedAgent {
     }
 
     public void setParent(IDocument engDocument) throws Exception {
-        this.log.info("Start Link.....");
+        this.log.info("Start Link.....:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
         try {
             String chkKeyPrnt = engDocument.getDescriptorValue("ccmPrjDocParentDoc");
             String chkKeyCrrsInc = engDocument.getDescriptorValue("ccmPrjDocTransIncCode");
