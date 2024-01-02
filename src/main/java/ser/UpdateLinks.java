@@ -108,7 +108,7 @@ public class UpdateLinks extends UnifiedAgent {
                             linkList.add(link.getTargetDocumentId());
                         }
                     }
-                    if (prntDocument != null && !prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                    if (prntDocument != null && !prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("Correspondence")) {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
@@ -125,7 +125,7 @@ public class UpdateLinks extends UnifiedAgent {
                             linkList.add(link.getTargetDocumentId());
                         }
                     }
-                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("Correspondence")) {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
@@ -142,7 +142,7 @@ public class UpdateLinks extends UnifiedAgent {
                             linkList.add(link.getTargetDocumentId());
                         }
                     }
-                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("TRANSMITTAL")) {
+                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("Correspondence")) {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
