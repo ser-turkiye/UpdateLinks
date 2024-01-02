@@ -44,7 +44,10 @@ public class UpdateLinks extends UnifiedAgent {
             prjCode = ldoc.getDescriptorValue("ccmPRJCard_code");
             try {
                 this.setParent(ldoc);
-                this.updateTransmittals(ldoc);
+                if(!this.updateTransmittals(ldoc)){
+                    log.info("restarting agent for updateTransmittals.");
+                    return resultRestart("Restarting Agent for updateTransmittals");
+                }
                 this.log.info("UpdateLinks Finished");
                 return this.resultSuccess("Ended successfully");
             } catch (Exception e) {
@@ -53,7 +56,7 @@ public class UpdateLinks extends UnifiedAgent {
             }
         }
     }
-    public void updateTransmittals(IDocument engDocument) throws Exception {
+    public boolean updateTransmittals(IDocument engDocument) throws Exception {
         this.log.info("Start update transmittals.....:" + engDocument.getDescriptorValue("ccmPrjDocNumber"));
         try {
             String trasnmittals = engDocument.getDescriptorValue("ccmPrjDocTransmittals");
@@ -63,8 +66,9 @@ public class UpdateLinks extends UnifiedAgent {
 
             engDocument.setDescriptorValue("ccmPrjDocTransmittals",String.join("\n",allTransmittals));
             engDocument.commit();
+            return true;
         }catch (Exception e){
-            throw new Exception("Exeption Caught..updateTransmittals: " + e);
+            return false;
         }
     }
 
@@ -108,7 +112,6 @@ public class UpdateLinks extends UnifiedAgent {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            engDocument.commit();
                             this.log.info("Created Link...");
                         }
                     }
@@ -126,7 +129,6 @@ public class UpdateLinks extends UnifiedAgent {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            engDocument.commit();
                             this.log.info("Created Link...");
                         }
                     }
@@ -144,12 +146,12 @@ public class UpdateLinks extends UnifiedAgent {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            engDocument.commit();
                             this.log.info("Created Link...");
                         }
                     }
                 }
             }
+
         }catch (Exception e){
             throw new Exception("Exeption Caught..setParent: " + e);
         }
