@@ -112,10 +112,12 @@ public class UpdateLinks extends UnifiedAgent {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            this.log.info("Created Link...");
+                            this.log.info("Created Link...parent ID:" + prntDocument.getID() + " to child doc ID:" + engDocument.getID());
                         }
                     }
                 }
+
+                linkList = new ArrayList<>();
                 if(chkKeyCrrsInc != null){
                     IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsInc);
                     this.log.info("Parent (CRRS) Doc ? " + prntDocument);
@@ -125,14 +127,16 @@ public class UpdateLinks extends UnifiedAgent {
                             linkList.add(link.getTargetDocumentId());
                         }
                     }
-                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("Correspondence")) {
+                    if (prntDocument != null) {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            this.log.info("Created Link...");
+                            this.log.info("Created Link...parent ID:" + prntDocument.getID() + " to child doc ID:" + engDocument.getID());
                         }
                     }
                 }
+
+                linkList = new ArrayList<>();
                 if(chkKeyCrrsOut != null){
                     IDocument prntDocument = this.getEngDocumentByNumber(ses, prjCode, chkKeyCrrsOut);
                     this.log.info("Parent (CRRS) Doc ? " + prntDocument);
@@ -142,11 +146,11 @@ public class UpdateLinks extends UnifiedAgent {
                             linkList.add(link.getTargetDocumentId());
                         }
                     }
-                    if (prntDocument != null && prntDocument.getDescriptorValue("ccmPrjDocCategory").trim().equalsIgnoreCase("Correspondence")) {
+                    if (prntDocument != null) {
                         if (!Objects.equals(prntDocument.getID(), engDocument.getID()) && !linkList.contains(engDocument.getID())) {
                             ILink lnk2 = srv.createLink(ses, prntDocument.getID(), (INodeGeneric) null, engDocument.getID());
                             lnk2.commit();
-                            this.log.info("Created Link...");
+                            this.log.info("Created Link...parent ID:" + prntDocument.getID() + " to child doc ID:" + engDocument.getID());
                         }
                     }
                 }
